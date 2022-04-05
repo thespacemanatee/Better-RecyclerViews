@@ -28,7 +28,7 @@ public class CharaAdapter extends RecyclerView.Adapter<CharaAdapter.CharaViewHol
 
     @Override
     public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int i) {
-        viewHolder.bind(pokemons.get(i));
+        viewHolder.bind(pokemons.get(i), i);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class CharaAdapter extends RecyclerView.Adapter<CharaAdapter.CharaViewHol
         return pokemons.size();
     }
 
-    static class CharaViewHolder extends RecyclerView.ViewHolder {
+    class CharaViewHolder extends RecyclerView.ViewHolder {
         ItemPokemonBinding binding;
 
         CharaViewHolder(ItemPokemonBinding binding) {
@@ -44,11 +44,15 @@ public class CharaAdapter extends RecyclerView.Adapter<CharaAdapter.CharaViewHol
             this.binding = binding;
         }
 
-        public void bind(Pokemon item) {
-            binding.cardViewImage.setImageDrawable(
+        public void bind(Pokemon item, int position) {
+            binding.cardIv.setImageDrawable(
                     ResourcesCompat.getDrawable(binding.getRoot().getResources(), item.getResId(), null)
             );
-            binding.cardViewTextName.setText(item.getName());
+            binding.cardTv.setText(item.getName());
+            binding.deleteIv.setOnClickListener(view -> {
+                pokemons.remove(position);
+                notifyDataSetChanged();
+            });
         }
     }
 }
