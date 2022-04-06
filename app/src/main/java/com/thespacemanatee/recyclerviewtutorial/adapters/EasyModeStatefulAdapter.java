@@ -20,18 +20,15 @@ public class EasyModeStatefulAdapter extends ListAdapter<StatefulPokemon, EasyMo
         this.listener = listener;
     }
 
-    public static final DiffUtil.ItemCallback<StatefulPokemon> DIFF_CALLBACK
-            = new DiffUtil.ItemCallback<StatefulPokemon>() {
+    public static final DiffUtil.ItemCallback<StatefulPokemon> DIFF_CALLBACK = new DiffUtil.ItemCallback<StatefulPokemon>() {
         @Override
-        public boolean areItemsTheSame(
-                @NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
+        public boolean areItemsTheSame(@NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
             // Pokemon properties may have changed if reloaded from the DB, but ID is fixed
             return oldPokemon.getId() == newPokemon.getId();
         }
 
         @Override
-        public boolean areContentsTheSame(
-                @NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
+        public boolean areContentsTheSame(@NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
             // NOTE: if you use equals, your object must properly override Object#equals()
             // Incorrectly returning false here will result in too many animations.
             return oldPokemon.equals(newPokemon);
@@ -57,7 +54,7 @@ public class EasyModeStatefulAdapter extends ListAdapter<StatefulPokemon, EasyMo
     }
 
     class CharaViewHolder extends RecyclerView.ViewHolder {
-        ItemPokemonBinding binding;
+        private final ItemPokemonBinding binding;
 
         CharaViewHolder(ItemPokemonBinding binding) {
             super(binding.getRoot());

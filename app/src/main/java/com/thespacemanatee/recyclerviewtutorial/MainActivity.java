@@ -14,6 +14,7 @@ import com.thespacemanatee.recyclerviewtutorial.screens.BadStatelessExampleFragm
 import com.thespacemanatee.recyclerviewtutorial.screens.BadStatefulExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.EasyStatefulExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.GoodStatefulExampleFragment;
+import com.thespacemanatee.recyclerviewtutorial.screens.MultipleViewTypesStatefulExampleFragment;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
                         tab.setText("Good Stateful");
                     } else if (position == 3) {
                         tab.setText("LifeHax");
+                    } else if (position == 4) {
+                        tab.setText("Multiple ViewTypes");
                     } else {
                         throw new IllegalArgumentException("Fragment does not exist!");
                     }
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static class ScreenSlidePagerAdapter extends FragmentStateAdapter {
-        private static final int NUM_PAGES = 4;
+        private static final int NUM_PAGES = 5;
 
         public ScreenSlidePagerAdapter(FragmentActivity fa) {
             super(fa);
@@ -64,12 +67,18 @@ public class MainActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             if (position == 0) {
                 return new BadStatelessExampleFragment();
-            } else if (position == 1) {
+            }
+            if (position == 1) {
                 return new BadStatefulExampleFragment();
-            } else if (position == 2) {
+            }
+            if (position == 2) {
                 return new GoodStatefulExampleFragment();
-            } else if (position == 3) {
+            }
+            if (position == 3) {
                 return new EasyStatefulExampleFragment();
+            }
+            if (position == 4) {
+                return new MultipleViewTypesStatefulExampleFragment();
             }
             throw new IllegalArgumentException("Fragment does not exist!");
         }

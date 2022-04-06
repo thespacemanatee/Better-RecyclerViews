@@ -5,11 +5,12 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 // Regular Java POJO, nothing special here
-public class Pokemon {
+public class Pokemon extends BaseItem {
     private final String name;
-    private final Integer resId;
+    private final int resId;
+    private final int viewType = VIEW_TYPE_POKEMON;
 
-    public Pokemon(String name, Integer resId) {
+    public Pokemon(String name, int resId) {
         this.name = name;
         this.resId = resId;
     }
@@ -18,8 +19,13 @@ public class Pokemon {
         return name;
     }
 
-    public Integer getResId() {
+    public int getResId() {
         return resId;
+    }
+
+    @Override
+    public int getViewType() {
+        return viewType;
     }
 
     @Override
@@ -27,12 +33,12 @@ public class Pokemon {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pokemon pokemon = (Pokemon) o;
-        return name.equals(pokemon.name) && resId.equals(pokemon.resId);
+        return resId == pokemon.resId && name.equals(pokemon.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, resId);
+        return Objects.hash(name, resId, viewType);
     }
 
     @NonNull
@@ -41,6 +47,7 @@ public class Pokemon {
         return "Pokemon{" +
                 "name='" + name + '\'' +
                 ", resId=" + resId +
+                ", viewType=" + viewType +
                 '}';
     }
 }
