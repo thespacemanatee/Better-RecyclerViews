@@ -25,7 +25,7 @@ public class BadStatefulExampleFragment extends Fragment {
     private FragmentPokemonListBinding binding;
 
     private final ArrayList<StatefulPokemon> adapterDataSource = new ArrayList<>();
-    private final BadStatefulAdapter badStatefulAdapter = new BadStatefulAdapter(adapterDataSource);
+    private BadStatefulAdapter badStatefulAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,16 +36,8 @@ public class BadStatefulExampleFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initView();
         initRecyclerView();
-        binding.fab.setOnClickListener(v -> {
-            // Just add a random new pokemon
-            Pair<String, Integer> pokemonData = pokemons.get(new Random().nextInt(pokemons.size()));
-            Snackbar.make(requireContext(), binding.getRoot(), "Added " + pokemonData.first, 500).show();
-            adapterDataSource.add(new StatefulPokemon(pokemonData.first, pokemonData.second, false));
-            // This is bad
-            badStatefulAdapter.notifyDataSetChanged();
-            binding.charaRecyclerView.smoothScrollToPosition(adapterDataSource.size() - 1);
-        });
     }
 
     // Make sure you clean up here to prevent memory leaks. This is only applicable to view binding
@@ -56,9 +48,36 @@ public class BadStatefulExampleFragment extends Fragment {
         binding = null;
     }
 
+    private void initView() {
+        binding.fab.setOnClickListener(v -> {
+            // Just add a random new pokemon
+            Pair<String, Integer> pokemonData = pokemons.get(new Random().nextInt(pokemons.size()));
+            Snackbar.make(requireContext(), binding.getRoot(), "Added " + pokemonData.first, 500).show();
+            adapterDataSource.add(new StatefulPokemon(pokemonData.first, pokemonData.second, false));
+            // This is bad
+            badStatefulAdapter.notifyDataSetChanged();
+            binding.charaRecyclerView.smoothScrollToPosition(adapterDataSource.size() - 1);
+            handleAnimation();
+        });
+    }
+
     private void initRecyclerView() {
+        BadStatefulAdapter.OnDeleteListener listener = this::handleAnimation;
+        badStatefulAdapter = new BadStatefulAdapter(adapterDataSource, listener);
         // Remember to set a layout manager or the recyclerview will not display anything!
         binding.charaRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
         binding.charaRecyclerView.setAdapter(badStatefulAdapter);
+    }
+
+    private void handleAnimation() {
+        if (adapterDataSource.isEmpty()) {
+            binding.emptyAnim.setVisibility(View.VISIBLE);
+            if (!binding.emptyAnim.isAnimating()) {
+                binding.emptyAnim.playAnimation();
+            }
+        } else {
+            binding.emptyAnim.setVisibility(View.GONE);
+            binding.emptyAnim.pauseAnimation();
+        }
     }
 }

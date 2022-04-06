@@ -16,9 +16,11 @@ import java.util.ArrayList;
 public class BadStatefulAdapter extends RecyclerView.Adapter<BadStatefulAdapter.CharaViewHolder> {
 
     private ArrayList<StatefulPokemon> pokemons;
+    private final OnDeleteListener listener;
 
-    public BadStatefulAdapter(ArrayList<StatefulPokemon> pokemons) {
+    public BadStatefulAdapter(ArrayList<StatefulPokemon> pokemons, OnDeleteListener listener) {
         this.pokemons = pokemons;
+        this.listener = listener;
     }
 
     @NonNull
@@ -63,7 +65,12 @@ public class BadStatefulAdapter extends RecyclerView.Adapter<BadStatefulAdapter.
                 pokemons.remove(item);
                 // Bad!
                 notifyDataSetChanged();
+                listener.deleteItem();
             });
         }
+    }
+
+    public interface OnDeleteListener {
+        void deleteItem();
     }
 }

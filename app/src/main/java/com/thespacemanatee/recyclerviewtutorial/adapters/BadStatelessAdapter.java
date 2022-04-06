@@ -9,15 +9,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.thespacemanatee.recyclerviewtutorial.databinding.ItemPokemonBinding;
 import com.thespacemanatee.recyclerviewtutorial.models.Pokemon;
+import com.thespacemanatee.recyclerviewtutorial.models.StatefulPokemon;
 
 import java.util.ArrayList;
 
-public class BadAdapter extends RecyclerView.Adapter<BadAdapter.CharaViewHolder> {
+public class BadStatelessAdapter extends RecyclerView.Adapter<BadStatelessAdapter.CharaViewHolder> {
 
     private ArrayList<Pokemon> pokemons;
+    private final BadStatelessAdapter.OnDeleteListener listener;
 
-    public BadAdapter(ArrayList<Pokemon> pokemons) {
+    public BadStatelessAdapter(ArrayList<Pokemon> pokemons, BadStatelessAdapter.OnDeleteListener listener) {
         this.pokemons = pokemons;
+        this.listener = listener;
     }
 
     @NonNull
@@ -54,7 +57,12 @@ public class BadAdapter extends RecyclerView.Adapter<BadAdapter.CharaViewHolder>
                 pokemons.remove(position);
                 // Bad!
                 notifyDataSetChanged();
+                listener.deleteItem();
             });
         }
+    }
+
+    public interface OnDeleteListener {
+        void deleteItem();
     }
 }

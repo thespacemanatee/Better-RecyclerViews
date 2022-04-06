@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.thespacemanatee.recyclerviewtutorial.databinding.ActivityMainBinding;
-import com.thespacemanatee.recyclerviewtutorial.screens.BadExampleFragment;
+import com.thespacemanatee.recyclerviewtutorial.screens.BadStatelessExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.BadStatefulExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.EasyStatefulExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.GoodStatefulExampleFragment;
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(binding.tabLayout, binding.pager,
                 (tab, position) -> {
                     if (position == 0) {
-                        tab.setText("Bad");
+                        tab.setText("Bad Stateless");
                     } else if (position == 1) {
                         tab.setText("Bad Stateful");
                     } else if (position == 2) {
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Fragment createFragment(int position) {
             if (position == 0) {
-                return new BadExampleFragment();
+                return new BadStatelessExampleFragment();
             } else if (position == 1) {
                 return new BadStatefulExampleFragment();
             } else if (position == 2) {

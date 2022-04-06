@@ -37,17 +37,8 @@ public class EasyStatefulExampleFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initView();
         initRecyclerView();
-        binding.fab.setOnClickListener(v -> {
-            // Just add a random new pokemon
-            Pair<String, Integer> pokemonData = pokemons.get(new Random().nextInt(pokemons.size()));
-            Snackbar.make(requireContext(), binding.getRoot(), "Added " + pokemonData.first, 500).show();
-            adapterDataSource.add(new StatefulPokemon(pokemonData.first, pokemonData.second, false));
-            // Submit the modified list, that's it! Note that the list must be a new instance!
-            easyModeStatefulAdapter.submitList(new ArrayList<>(adapterDataSource));
-            // No longer need to call notifyDataSetChanged()!
-            binding.charaRecyclerView.smoothScrollToPosition(adapterDataSource.size() - 1);
-        });
     }
 
     // Make sure you clean up here to prevent memory leaks. This is only applicable to view binding
@@ -58,16 +49,43 @@ public class EasyStatefulExampleFragment extends Fragment {
         binding = null;
     }
 
+    private void initView() {
+        binding.fab.setOnClickListener(v -> {
+            // Just add a random new pokemon
+            Pair<String, Integer> pokemonData = pokemons.get(new Random().nextInt(pokemons.size()));
+            Snackbar.make(requireContext(), binding.getRoot(), "Added " + pokemonData.first, 500).show();
+            adapterDataSource.add(new StatefulPokemon(pokemonData.first, pokemonData.second, false));
+            // Submit the modified list, that's it! Note that the list must be a new instance!
+            easyModeStatefulAdapter.submitList(new ArrayList<>(adapterDataSource));
+            // No longer need to call notifyDataSetChanged()!
+            binding.charaRecyclerView.smoothScrollToPosition(adapterDataSource.size() - 1);
+            handleAnimation();
+        });
+    }
+
     private void initRecyclerView() {
         EasyModeStatefulAdapter.OnDeleteListener listener = item -> {
             adapterDataSource.remove(item);
             // Always submit a NEW list because AsyncListDiffer does nothing if it receives the same
             // list instance
             easyModeStatefulAdapter.submitList(new ArrayList<>(adapterDataSource));
+            handleAnimation();
         };
         easyModeStatefulAdapter = new EasyModeStatefulAdapter(listener);
         // Remember to set a layout manager or the recyclerview will not display anything!
         binding.charaRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
         binding.charaRecyclerView.setAdapter(easyModeStatefulAdapter);
+    }
+
+    private void handleAnimation() {
+        if (adapterDataSource.isEmpty()) {
+            binding.emptyAnim.setVisibility(View.VISIBLE);
+            if (!binding.emptyAnim.isAnimating()) {
+                binding.emptyAnim.playAnimation();
+            }
+        } else {
+            binding.emptyAnim.setVisibility(View.GONE);
+            binding.emptyAnim.pauseAnimation();
+        }
     }
 }

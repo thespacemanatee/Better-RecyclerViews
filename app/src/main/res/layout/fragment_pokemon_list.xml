@@ -6,10 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/emptyAnim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/empty" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/charaRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingVertical="8dp"
         tools:listitem="@layout/item_pokemon" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -20,6 +30,6 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
         android:contentDescription="FAB"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
