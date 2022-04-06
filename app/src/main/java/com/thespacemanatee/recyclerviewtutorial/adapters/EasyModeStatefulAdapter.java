@@ -84,8 +84,4 @@ public class EasyModeStatefulAdapter extends ListAdapter<StatefulPokemon, EasyMo
             });
         }
     }
-
-    public interface OnDeleteListener {
-        void deleteItem(StatefulPokemon item);
-    }
 }

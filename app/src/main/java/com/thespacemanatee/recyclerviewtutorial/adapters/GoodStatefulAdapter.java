@@ -91,8 +91,4 @@ public class GoodStatefulAdapter extends RecyclerView.Adapter<GoodStatefulAdapte
             });
         }
     }
-
-    public interface OnDeleteListener {
-        void deleteItem(StatefulPokemon item);
-    }
 }

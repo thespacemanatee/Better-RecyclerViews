@@ -79,6 +79,8 @@ public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, Recy
 
     @Override
     public int getItemViewType(int position) {
+        // Remember to override this method to tell the recycler view what a particular view holder's
+        // type is. We defined a getItemViewType() method in our data classes which returns an integer.
         return getCurrentList().get(position).getViewType();
     }
 
@@ -128,9 +130,5 @@ public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, Recy
                 // No longer need to call notifyDataSetChanged()!
             });
         }
-    }
-
-    public interface OnDeleteListener {
-        void deleteItem(BaseItem item);
     }
 }

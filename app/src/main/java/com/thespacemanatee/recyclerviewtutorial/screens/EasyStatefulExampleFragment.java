@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.thespacemanatee.recyclerviewtutorial.adapters.EasyModeStatefulAdapter;
 import com.thespacemanatee.recyclerviewtutorial.adapters.GoodStatefulAdapter;
+import com.thespacemanatee.recyclerviewtutorial.adapters.OnDeleteListener;
 import com.thespacemanatee.recyclerviewtutorial.databinding.FragmentPokemonListBinding;
 import com.thespacemanatee.recyclerviewtutorial.models.StatefulPokemon;
 
@@ -64,8 +65,8 @@ public class EasyStatefulExampleFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        EasyModeStatefulAdapter.OnDeleteListener listener = item -> {
-            adapterDataSource.remove(item);
+        OnDeleteListener listener = item -> {
+            adapterDataSource.remove((StatefulPokemon) item);
             // Always submit a NEW list because AsyncListDiffer does nothing if it receives the same
             // list instance
             easyModeStatefulAdapter.submitList(new ArrayList<>(adapterDataSource));

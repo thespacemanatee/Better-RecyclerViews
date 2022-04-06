@@ -65,12 +65,8 @@ public class BadStatefulAdapter extends RecyclerView.Adapter<BadStatefulAdapter.
                 pokemons.remove(item);
                 // Bad!
                 notifyDataSetChanged();
-                listener.deleteItem();
+                listener.deleteItem(item);
             });
         }
-    }
-
-    public interface OnDeleteListener {
-        void deleteItem();
     }
 }

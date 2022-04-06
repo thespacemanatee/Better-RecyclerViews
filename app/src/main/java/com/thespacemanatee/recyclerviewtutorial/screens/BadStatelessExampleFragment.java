@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.thespacemanatee.recyclerviewtutorial.adapters.BadStatelessAdapter;
+import com.thespacemanatee.recyclerviewtutorial.adapters.OnDeleteListener;
 import com.thespacemanatee.recyclerviewtutorial.databinding.FragmentPokemonListBinding;
 import com.thespacemanatee.recyclerviewtutorial.models.Pokemon;
 
@@ -62,7 +63,7 @@ public class BadStatelessExampleFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        BadStatelessAdapter.OnDeleteListener listener = this::handleAnimation;
+        OnDeleteListener listener = (item) -> handleAnimation();
         badStatelessAdapter = new BadStatelessAdapter(adapterDataSource, listener);
         // Remember to set a layout manager or the recyclerview will not display anything!
         binding.charaRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));

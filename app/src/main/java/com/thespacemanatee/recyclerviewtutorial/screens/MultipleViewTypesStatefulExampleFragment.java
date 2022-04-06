@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.thespacemanatee.recyclerviewtutorial.adapters.MultipleViewTypesStatefulAdapter;
+import com.thespacemanatee.recyclerviewtutorial.adapters.OnDeleteListener;
 import com.thespacemanatee.recyclerviewtutorial.databinding.FragmentPokemonListBinding;
 import com.thespacemanatee.recyclerviewtutorial.models.BaseItem;
 import com.thespacemanatee.recyclerviewtutorial.models.SectionItem;
@@ -73,7 +74,7 @@ public class MultipleViewTypesStatefulExampleFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        MultipleViewTypesStatefulAdapter.OnDeleteListener listener = item -> {
+        OnDeleteListener listener = item -> {
             adapterDataSource.remove(item);
             // Always submit a NEW list because AsyncListDiffer does nothing if it receives the same
             // list instance
