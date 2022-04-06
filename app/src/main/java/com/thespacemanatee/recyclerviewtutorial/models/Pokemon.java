@@ -1,4 +1,4 @@
-package com.thespacemanatee.recyclerviewtutorial.adapter;
+package com.thespacemanatee.recyclerviewtutorial.models;
 
 import androidx.annotation.NonNull;
 

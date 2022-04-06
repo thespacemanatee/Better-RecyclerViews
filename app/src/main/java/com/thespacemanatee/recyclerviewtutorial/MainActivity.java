@@ -1,66 +1,82 @@
 package com.thespacemanatee.recyclerviewtutorial;
 
 import android.os.Bundle;
-import android.util.Pair;
-import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.thespacemanatee.recyclerviewtutorial.adapter.CharaAdapter;
-import com.thespacemanatee.recyclerviewtutorial.adapter.Pokemon;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.thespacemanatee.recyclerviewtutorial.databinding.ActivityMainBinding;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import com.thespacemanatee.recyclerviewtutorial.screens.BadExampleFragment;
+import com.thespacemanatee.recyclerviewtutorial.screens.BadStatefulExampleFragment;
+import com.thespacemanatee.recyclerviewtutorial.screens.EasyStatefulExampleFragment;
+import com.thespacemanatee.recyclerviewtutorial.screens.GoodStatefulExampleFragment;
 
 public class MainActivity extends AppCompatActivity {
-
-    ArrayList<Pokemon> adapterDataSource = new ArrayList<>();
-    CharaAdapter charaAdapter = new CharaAdapter(adapterDataSource);
-
-    // List of random pokemons
-    List<Pair<String, Integer>> pokemons = Arrays.asList(
-            new Pair<>("Bulbasaur", R.drawable.bulbasaur),
-            new Pair<>("Eevee", R.drawable.eevee),
-            new Pair<>("Gyrados", R.drawable.gyrados),
-            new Pair<>("Pikachu", R.drawable.pikachu),
-            new Pair<>("Psyduck", R.drawable.psyduck),
-            new Pair<>("Snorlax", R.drawable.snorlax),
-            new Pair<>("Spearow", R.drawable.spearow),
-            new Pair<>("Squirtle", R.drawable.squirtle)
-    );
-
     private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar);
-
-        initRecyclerView();
-
-        binding.fab.setOnClickListener(view -> {
-            // Just add a random new pokemon
-            Pair<String, Integer> pokemonData = pokemons.get(new Random().nextInt(pokemons.size()));
-            Snackbar.make(this, binding.getRoot(), "Added " + pokemonData.first, 500).show();
-            adapterDataSource.add(new Pokemon(pokemonData.first, pokemonData.second));
-            // This is bad
-            charaAdapter.notifyDataSetChanged();
-            binding.charaRecyclerView.smoothScrollToPosition(adapterDataSource.size() - 1);
-        });
+        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
+        binding.pager.setAdapter(pagerAdapter);
+        new TabLayoutMediator(binding.tabLayout, binding.pager,
+                (tab, position) -> {
+                    if (position == 0) {
+                        tab.setText("Bad");
+                    } else if (position == 1) {
+                        tab.setText("Bad Stateful");
+                    } else if (position == 2) {
+                        tab.setText("Good Stateful");
+                    } else if (position == 3) {
+                        tab.setText("LifeHax");
+                    } else {
+                        throw new IllegalArgumentException("Fragment does not exist!");
+                    }
+                }
+        ).attach();
     }
 
-    private void initRecyclerView() {
-        // Remember to set a layout manager or the recyclerview will not display anything!
-        binding.charaRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        binding.charaRecyclerView.setAdapter(charaAdapter);
+    @Override
+    public void onBackPressed() {
+        if (binding.pager.getCurrentItem() == 0) {
+            super.onBackPressed();
+        } else {
+            binding.pager.setCurrentItem(binding.pager.getCurrentItem() - 1);
+        }
+    }
+
+    private static class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+        private static final int NUM_PAGES = 4;
+
+        public ScreenSlidePagerAdapter(FragmentActivity fa) {
+            super(fa);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            if (position == 0) {
+                return new BadExampleFragment();
+            } else if (position == 1) {
+                return new BadStatefulExampleFragment();
+            } else if (position == 2) {
+                return new GoodStatefulExampleFragment();
+            } else if (position == 3) {
+                return new EasyStatefulExampleFragment();
+            }
+            throw new IllegalArgumentException("Fragment does not exist!");
+        }
+
+        @Override
+        public int getItemCount() {
+            return NUM_PAGES;
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.thespacemanatee.recyclerviewtutorial.adapter;
+package com.thespacemanatee.recyclerviewtutorial.adapters;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -8,27 +8,28 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.thespacemanatee.recyclerviewtutorial.databinding.ItemPokemonBinding;
+import com.thespacemanatee.recyclerviewtutorial.models.Pokemon;
 
 import java.util.ArrayList;
 
-public class CharaAdapter extends RecyclerView.Adapter<CharaAdapter.CharaViewHolder> {
+public class BadAdapter extends RecyclerView.Adapter<BadAdapter.CharaViewHolder> {
 
-    ArrayList<Pokemon> pokemons;
+    private ArrayList<Pokemon> pokemons;
 
-    public CharaAdapter(ArrayList<Pokemon> pokemons) {
+    public BadAdapter(ArrayList<Pokemon> pokemons) {
         this.pokemons = pokemons;
     }
 
     @NonNull
     @Override
-    public CharaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+    public CharaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemPokemonBinding binding = ItemPokemonBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new CharaViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int i) {
-        viewHolder.bind(pokemons.get(i), i);
+    public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int position) {
+        viewHolder.bind(pokemons.get(position), position);
     }
 
     @Override
@@ -51,6 +52,7 @@ public class CharaAdapter extends RecyclerView.Adapter<CharaAdapter.CharaViewHol
             binding.cardTv.setText(item.getName());
             binding.deleteIv.setOnClickListener(view -> {
                 pokemons.remove(position);
+                // Bad!
                 notifyDataSetChanged();
             });
         }
