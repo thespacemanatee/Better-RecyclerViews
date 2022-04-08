@@ -42,6 +42,39 @@ data source for your `RecyclerView`.
 - At each example, try out the respective example in the app to get a better idea of what I'm talking about.
 - Please read my inline code comments!
 
+### Single Responsibility Principle
+
+- In the `RecyclerView.Adapter` class, you have to override 3 methods
+  - onCreateViewHolder()
+    - You should only write code that inflates the `ViewHolder`, nothing more
+    - ```java
+        @NonNull
+        @Override
+        public CharaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            ItemPokemonBinding binding = ItemPokemonBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new CharaViewHolder(binding);
+        }
+      ```
+  - onBindViewHolder()
+      - You should only write code to bind your item data to your `ViewHolders` (such as `Pokemon` data), nothing more
+      - ```java
+          @Override
+          public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int position) {
+              viewHolder.bind(pokemons.get(position), position);
+          }
+        ```
+  - getItemCount()
+      - You should only return the size of your data source, nothing more
+      - ```java
+          @Override
+          public int getItemCount() {
+              return pokemons.size();
+          }
+        ```
+- Your `ViewHolder` class should should expose a `bind()` method, which you should call in `onBindViewHolder()`
+to bind your `Pokemon` data to your `ViewHolder`. Provide your logic for binding this data to your `View` inside this
+function only.
+
 ### Example 1 - BadStatelessExample
 
 #### Problems
