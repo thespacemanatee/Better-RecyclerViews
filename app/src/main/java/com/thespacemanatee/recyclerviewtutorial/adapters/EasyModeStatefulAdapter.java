@@ -16,6 +16,7 @@ public class EasyModeStatefulAdapter extends ListAdapter<StatefulPokemon, EasyMo
     private final OnDeleteListener listener;
 
     public EasyModeStatefulAdapter(OnDeleteListener listener) {
+        // Pass DIFF_CALLBACK into super class ListAdapter's constructor
         super(DIFF_CALLBACK);
         this.listener = listener;
     }
@@ -44,7 +45,7 @@ public class EasyModeStatefulAdapter extends ListAdapter<StatefulPokemon, EasyMo
 
     @Override
     public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int position) {
-        // mDiffer exists in the super class ListAdapter
+        // You now have access to list with getCurrentList() which is a method of the super class
         viewHolder.bind(getCurrentList().get(position));
     }
 

@@ -36,8 +36,8 @@ https://user-images.githubusercontent.com/6837599/162474055-bbbe7c1a-dbc3-4003-9
     1. This is bad for performance because it forces the entire `RecyclerView` to re-render - it
        does not know which item has been modified/deleted etc.
 4. Not storing the state of your `ViewHolders` somewhere
-    1. This leads to weird behaviour such as CheckBoxes checking themselves for no reason (explained
-       later)
+    1. This leads to weird behaviour such as CheckBoxes checking and unchecking themselves for no
+       reason (explained later)
 
 We will discover how to prevent mistakes 2,3, and 4 below!
 
@@ -52,7 +52,7 @@ We just need to focus on these 2 files for each example:
 - *Adapter
 ```
 
-The database of pokemons is hardcoded in `data/PokemonDatabase.java`. You may plug in your desired
+The database of pokemons is hardcoded in `/data/PokemonDatabase.java`. You may plug in your desired
 data source for your `RecyclerView`.
 
 ---
@@ -69,13 +69,14 @@ data source for your `RecyclerView`.
 
 #### Single Responsibility Principle
 
-- In the `RecyclerView.Adapter` class, you have to override 3 methods. Each method should only do
-  one thing.
-    - `onCreateViewHolder()`
-        - You should only write code that inflates the `ViewHolder`, nothing more
+In the `RecyclerView.Adapter` class, you have to override 3 methods. Each method should only do one
+thing.
+
+- `onCreateViewHolder()`
+    - You should only write code that inflates the `ViewHolder`, nothing more
 
 ```java
-public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     @Override
     public CharaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -91,9 +92,10 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
       data), nothing more
 
 ```java
-public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int position) {
+        // bind() method is defined in CharaViewHolder class
         viewHolder.bind(pokemons.get(position), position);
     }
 }
@@ -103,7 +105,7 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     - You should only return the size of your data source, nothing more
 
 ```java
-public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public int getItemCount() {
         return pokemons.size();
@@ -114,7 +116,8 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 - Your `ViewHolder` class should should expose a `bind()` method, which you should call
   in `onBindViewHolder()`
   to bind your `Pokemon` data to your `ViewHolder`. Provide your logic for binding this data to
-  your `View` inside this function only.
+  your `View` inside this function only (you can have utility private functions in this class of
+  course).
 
 ```java
 class CharaViewHolder extends RecyclerView.ViewHolder {
@@ -137,15 +140,21 @@ class CharaViewHolder extends RecyclerView.ViewHolder {
 
 ### Example 1 - BadStatelessExample
 
+This is the most common type of `RecylerView` written by budding Android Developers. There are alot
+of problems we can fix here.
+
 #### Problems
 
 1. We have a stateless `Pokemon` class that does not store any state about itself
     1. How do we keep track of this `Pokemon`'s CheckBox selected state?
 2. We are calling `notifyDataSetChanged()`, see [here](#common-mistakes) for why it is bad.
+3. There are no animations when adding and deleting items, making for a bad user experience.
 
 ---
 
 ### Example 2 - BadStatefulExample
+
+This example is better than the previous, but we can certainly do better.
 
 #### What's Fixed?
 
@@ -171,16 +180,41 @@ class CharaViewHolder extends RecyclerView.ViewHolder {
 #### Problems
 
 1. We are still calling `notifyDataSetChanged()`, see [here](#common-mistakes) for why it is bad.
+2. Still no animations 😔
 
 ---
 
 ### Example 3 - GoodStatefulExample
+
+This example is typically all you need to write good `RecyclerViews` everywhere! Read on to find out
+some other cool tricks you can do with `RecyclerViews`!
 
 #### What's Fixed?
 
 1. We are no longer calling `notifyDataSetChanged()`! We are using `DiffUtil` and `AsyncListDiffer`
    instead, and we call `adapter.submitList()` in the `GoodStatefulExampleFragment` whenever we
    add/remove an item from the list, or when we want to replace the entire list altogether.
+
+```java
+public class GoodStatefulAdapter extends RecyclerView.Adapter<GoodStatefulAdapter.CharaViewHolder> {
+    public static final DiffUtil.ItemCallback<StatefulPokemon> DIFF_CALLBACK = new DiffUtil.ItemCallback<StatefulPokemon>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
+            // Pokemon properties may have changed if reloaded from the DB, but ID is fixed
+            return oldPokemon.getId() == newPokemon.getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
+            // NOTE: if you use equals, your object must properly override Object#equals()
+            // Incorrectly returning false here will result in too many animations.
+            return oldPokemon.equals(newPokemon);
+        }
+    };
+
+    private final AsyncListDiffer<StatefulPokemon> mDiffer = new AsyncListDiffer<>(this, DIFF_CALLBACK);
+}
+```
 
 ```java
 public class GoodStatefulExampleFragment extends Fragment {
@@ -224,3 +258,146 @@ to reflect these changes, with a cool animation!
     - This is because `AsyncListDiffer` does a shallow reference equality check between the new list
       and old list before doing any diffing, and if the reference is the same, it won't even care
       that the contents have changed. The simplest way is to write `new ArrayList<>(oldList)`.
+
+---
+
+### Example 4 - EasyModeStatefulExample
+
+In example 3, we introduced quite a bit of boilerplate code (even though we removed some in the
+process). To make the process less error-prone and eliminate some more boilerplate code, we can use
+`ListAdapter`, another helper class provided by Google. This class is provided in
+the `androidx.recyclerview:recyclerview` package by default.
+
+```java
+public class EasyModeStatefulAdapter extends ListAdapter<StatefulPokemon, EasyModeStatefulAdapter.CharaViewHolder> {
+    public EasyModeStatefulAdapter(OnDeleteListener listener) {
+        // Pass DIFF_CALLBACK into super class ListAdapter's constructor
+        super(DIFF_CALLBACK);
+    }
+
+    public static final DiffUtil.ItemCallback<StatefulPokemon> DIFF_CALLBACK = new DiffUtil.ItemCallback<StatefulPokemon>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
+            return oldPokemon.getId() == newPokemon.getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull StatefulPokemon oldPokemon, @NonNull StatefulPokemon newPokemon) {
+            return oldPokemon.equals(newPokemon);
+        }
+    };
+
+    @Override
+    public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int position) {
+        // You now have access to list with getCurrentList() which is a method of the super class
+        viewHolder.bind(getCurrentList().get(position));
+    }
+}
+```
+
+---
+
+### Example 5 - MultipleViewTypesStatefulExample
+
+This example demonstrates how you can render different types of `ViewHolders` in your `RecyclerView`
+.
+
+#### Why would you want to render different types of ViewHolders?
+
+Imagine you want to have different sections in your list. You want to have section titles between
+those sections, and show different items in each section. You can either achieve this
+with [ConcatAdapter](https://developer.android.com/reference/androidx/recyclerview/widget/ConcatAdapter)
+or by overriding `getItemViewType(int position)` in your `RecyclerView.Adapter`. This example uses
+the second method which is enough for simple requirements.
+
+To make our code cleaner, I have extended `Pokemon` and `SectionItem` classes with the `BaseItem`
+abstract class, which has a single abstract method `getItemViewType()` with return type `int`.
+Within each subclass, I override this method to return a constant `int`. This `int` can be an
+arbitrary value, and you will handle the logic of parsing this value in the adapter with your own
+custom logic.
+
+Also create a new class that extends `RecyclerView.ViewHolder` for each type of layout you want to
+show. In this example, we created `SectionViewHolder` as our second type of `ViewHolder`.
+
+```java
+class SectionViewHolder extends RecyclerView.ViewHolder {
+    private final ItemSectionTitleBinding binding;
+
+    SectionViewHolder(ItemSectionTitleBinding binding) {
+        super(binding.getRoot());
+        this.binding = binding;
+    }
+
+    public void bind(SectionItem item) {
+        binding.sectionTitleTv.setText(item.getTitle());
+        binding.deleteIv.setOnClickListener(view -> {
+            listener.deleteItem(item);
+        });
+    }
+}
+```
+
+#### Override getItemViewType()
+
+```java
+
+public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, RecyclerView.ViewHolder> {
+    @Override
+    public int getItemViewType(int position) {
+        // Remember to override this method to tell the recycler view what a particular view holder's
+        // type is. We defined a getItemViewType() method in our data classes which returns an integer.
+        return getCurrentList().get(position).getViewType();
+    }
+}
+```
+
+#### Modify onCreateViewHolder()
+
+```java
+public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, RecyclerView.ViewHolder> {
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Check the viewTypes that we returned from our overridden getItemViewType() method and inflate the correct layout
+        // based on that value
+        if (viewType == VIEW_TYPE_SECTION_TITLE) {
+            ItemSectionTitleBinding binding = ItemSectionTitleBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new SectionViewHolder(binding);
+        }
+        if (viewType == VIEW_TYPE_POKEMON) {
+            ItemPokemonBinding binding = ItemPokemonBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new CharaViewHolder(binding);
+        }
+        throw new IllegalArgumentException("Unknown view type: " + viewType);
+    }
+}
+```
+
+#### Modify onBindViewHolder()
+
+```java
+public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, RecyclerView.ViewHolder> {
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        // We can get the viewType of the current ViewHolder at this position and cast it to the correct class
+        // accordingly and call that class' bind method.
+        if (getCurrentList().get(position).getViewType() == VIEW_TYPE_SECTION_TITLE) {
+            ((SectionViewHolder) viewHolder).bind((SectionItem) getCurrentList().get(position));
+        } else if (getCurrentList().get(position).getViewType() == VIEW_TYPE_POKEMON) {
+            ((CharaViewHolder) viewHolder).bind((StatefulPokemon) getCurrentList().get(position));
+        }
+    }
+}
+```
+
+### Conclusion
+
+If you read this far, you're officially equipped with the knowledge to write performant and
+stylish `RecyclerViews` which are readable and maintainable by other developers! There is so much
+more to discover with `RecyclerViews` and I hope that after reading this tutorial, `RecyclerViews`
+don't seem that scary anymore, and can actually be fun to write 😀
+
+### Acknowledgements
+
+- SUTD 50.001 professors from which I took the base code from (Android Lesson 4)
+- [Chee Kit - 50.001 TA](https://www.linkedin.com/in/chee-kit/)

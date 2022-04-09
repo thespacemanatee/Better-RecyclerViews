@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.thespacemanatee.recyclerviewtutorial.adapters.EasyModeStatefulAdapter;
-import com.thespacemanatee.recyclerviewtutorial.adapters.GoodStatefulAdapter;
 import com.thespacemanatee.recyclerviewtutorial.adapters.OnDeleteListener;
 import com.thespacemanatee.recyclerviewtutorial.databinding.FragmentPokemonListBinding;
 import com.thespacemanatee.recyclerviewtutorial.models.StatefulPokemon;
@@ -23,7 +22,7 @@ import com.thespacemanatee.recyclerviewtutorial.models.StatefulPokemon;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class EasyStatefulExampleFragment extends Fragment {
+public class EasyModeStatefulExampleFragment extends Fragment {
     private FragmentPokemonListBinding binding;
 
     private final ArrayList<StatefulPokemon> adapterDataSource = new ArrayList<>();

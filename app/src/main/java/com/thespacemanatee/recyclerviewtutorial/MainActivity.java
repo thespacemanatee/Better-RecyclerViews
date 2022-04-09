@@ -12,7 +12,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.thespacemanatee.recyclerviewtutorial.databinding.ActivityMainBinding;
 import com.thespacemanatee.recyclerviewtutorial.screens.BadStatelessExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.BadStatefulExampleFragment;
-import com.thespacemanatee.recyclerviewtutorial.screens.EasyStatefulExampleFragment;
+import com.thespacemanatee.recyclerviewtutorial.screens.EasyModeStatefulExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.GoodStatefulExampleFragment;
 import com.thespacemanatee.recyclerviewtutorial.screens.MultipleViewTypesStatefulExampleFragment;
 
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 return new GoodStatefulExampleFragment();
             }
             if (position == 3) {
-                return new EasyStatefulExampleFragment();
+                return new EasyModeStatefulExampleFragment();
             }
             if (position == 4) {
                 return new MultipleViewTypesStatefulExampleFragment();

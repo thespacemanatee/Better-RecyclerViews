@@ -51,6 +51,8 @@ public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, Recy
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Check the viewTypes that we returned from our overridden getItemViewType() method and inflate the correct layout
+        // based on that value
         if (viewType == VIEW_TYPE_SECTION_TITLE) {
             ItemSectionTitleBinding binding = ItemSectionTitleBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new SectionViewHolder(binding);
@@ -64,7 +66,8 @@ public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, Recy
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-        // Bind item to view based on item view type, which we defined in the respective classes
+        // We can get the viewType of the current ViewHolder at this position and cast it to the correct class
+        // accordingly and call that class' bind method.
         if (getCurrentList().get(position).getViewType() == VIEW_TYPE_SECTION_TITLE) {
             ((SectionViewHolder) viewHolder).bind((SectionItem) getCurrentList().get(position));
         } else if (getCurrentList().get(position).getViewType() == VIEW_TYPE_POKEMON) {
