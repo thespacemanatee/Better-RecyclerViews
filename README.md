@@ -150,6 +150,10 @@ of problems we can fix here.
 2. We are calling `notifyDataSetChanged()`, see [here](#common-mistakes) for why it is bad.
 3. There are no animations when adding and deleting items, making for a bad user experience.
 
+#### Demo
+
+https://user-images.githubusercontent.com/6837599/162566414-a5480684-5e62-4505-adf6-ca2f62562760.mp4
+
 ---
 
 ### Example 2 - BadStatefulExample
@@ -181,6 +185,10 @@ class CharaViewHolder extends RecyclerView.ViewHolder {
 
 1. We are still calling `notifyDataSetChanged()`, see [here](#common-mistakes) for why it is bad.
 2. Still no animations 😔
+
+#### Demo
+
+https://user-images.githubusercontent.com/6837599/162566488-59940fd8-394b-4467-a419-ec13800a953e.mp4
 
 ---
 
@@ -295,6 +303,10 @@ public class EasyModeStatefulAdapter extends ListAdapter<StatefulPokemon, EasyMo
 }
 ```
 
+#### Demo
+
+https://user-images.githubusercontent.com/6837599/162566397-49920f39-3e99-4dc5-828c-83dbdcde2f4d.mp4
+
 ---
 
 ### Example 5 - MultipleViewTypesStatefulExample
@@ -389,6 +401,10 @@ public class MultipleViewTypesStatefulAdapter extends ListAdapter<BaseItem, Recy
     }
 }
 ```
+
+#### Demo
+
+https://user-images.githubusercontent.com/6837599/162566544-be5f20ff-fa75-4d67-a206-3d711e0b1830.mp4
 
 ### Conclusion
 
