@@ -65,35 +65,51 @@ data source for your `RecyclerView`.
 
 ---
 
-### Single Responsibility Principle
+### RecyclerView Basics
 
-- In the `RecyclerView.Adapter` class, you have to override 3 methods
-  - `onCreateViewHolder()`
-    - You should only write code that inflates the `ViewHolder`, nothing more
-    - ```java
-        @NonNull
-        @Override
-        public CharaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ItemPokemonBinding binding = ItemPokemonBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            return new CharaViewHolder(binding);
-        }
-      ```
-  - `onBindViewHolder()`
-      - You should only write code to bind your item data to your `ViewHolders` (such as `Pokemon` data), nothing more
-      - ```java
-          @Override
-          public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int position) {
-              viewHolder.bind(pokemons.get(position), position);
-          }
-        ```
-  - `getItemCount()`
-      - You should only return the size of your data source, nothing more
-      - ```java
-          @Override
-          public int getItemCount() {
-              return pokemons.size();
-          }
-        ```
+#### Single Responsibility Principle
+
+- In the `RecyclerView.Adapter` class, you have to override 3 methods. Each method should only do
+  one thing.
+    - `onCreateViewHolder()`
+        - You should only write code that inflates the `ViewHolder`, nothing more
+
+```java
+public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    @NonNull
+    @Override
+    public CharaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemPokemonBinding binding = ItemPokemonBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new CharaViewHolder(binding);
+    }
+}
+
+```
+
+- `onBindViewHolder()`
+    - You should only write code to bind your item data to your `ViewHolders` (such as `Pokemon`
+      data), nothing more
+
+```java
+public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    @Override
+    public void onBindViewHolder(@NonNull CharaViewHolder viewHolder, int position) {
+        viewHolder.bind(pokemons.get(position), position);
+    }
+}
+```
+
+- `getItemCount()`
+    - You should only return the size of your data source, nothing more
+
+```java
+public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    @Override
+    public int getItemCount() {
+        return pokemons.size();
+    }
+}
+```
 
 - Your `ViewHolder` class should should expose a `bind()` method, which you should call
   in `onBindViewHolder()`
@@ -101,17 +117,19 @@ data source for your `RecyclerView`.
   your `View` inside this function only.
 
 ```java
-public void bind(Pokemon item, int position) {
-    binding.cardIv.setImageDrawable(
-            ResourcesCompat.getDrawable(binding.getRoot().getResources(), item.getResId(), null)
-    );
-    binding.cardTv.setText(item.getName());
-    binding.deleteIv.setOnClickListener(view -> {
-        pokemons.remove(position);
-        // Bad!
-        notifyDataSetChanged();
-        listener.deleteItem(item);
-    });
+class CharaViewHolder extends RecyclerView.ViewHolder {
+    public void bind(Pokemon item, int position) {
+        binding.cardIv.setImageDrawable(
+                ResourcesCompat.getDrawable(binding.getRoot().getResources(), item.getResId(), null)
+        );
+        binding.cardTv.setText(item.getName());
+        binding.deleteIv.setOnClickListener(view -> {
+            pokemons.remove(position);
+            // Bad!
+            notifyDataSetChanged();
+            listener.deleteItem(item);
+        });
+    }
 }
 ```
 
@@ -134,17 +152,50 @@ public void bind(Pokemon item, int position) {
 1. We have a stateful `StatefulPokemon` class that extends `Pokemon` and simply stores an `id`
    and `isSelected` for CheckBox state
 
+```java
+class CharaViewHolder extends RecyclerView.ViewHolder {
+    public void bind(StatefulPokemon item) {
+        // Set check box state stored in item instance
+        binding.checkBox.setChecked(item.getIsSelected());
+        binding.checkBox.setOnCheckedChangeListener((view, checked) -> {
+            if (view.isPressed()) {
+                // Persist selected state in the instance
+                item.setIsSelected(checked);
+            }
+        });
+
+    }
+}
+```
+
 #### Problems
 
 1. We are still calling `notifyDataSetChanged()`, see [here](#common-mistakes) for why it is bad.
 
 ---
 
-### Example 3 - BadStatefulExample
+### Example 3 - GoodStatefulExample
 
 #### What's Fixed?
 
-1. We are no longer calling `notifyDataSetChanged()`! We are using `DiffUtil` instead.
+1. We are no longer calling `notifyDataSetChanged()`! We are using `DiffUtil` and `AsyncListDiffer`
+   instead, and we call `adapter.submitList()` in the `GoodStatefulExampleFragment` whenever we
+   add/remove an item from the list, or when we want to replace the entire list altogether.
+
+```java
+public class GoodStatefulExampleFragment extends Fragment {
+    private void initView() {
+        binding.fab.setOnClickListener(v -> {
+            // Just add a random new pokemon
+            Pair<String, Integer> pokemonData = pokemons.get(new Random().nextInt(pokemons.size()));
+            adapterDataSource.add(new StatefulPokemon(pokemonData.first, pokemonData.second, false));
+            // Submit the modified list, that's it! Note that the list must be a new instance!
+            goodStatefulAdapter.submitList(new ArrayList<>(adapterDataSource));
+            // No longer need to call notifyDataSetChanged()!
+        });
+    }
+}
+```
 
 ---
 
